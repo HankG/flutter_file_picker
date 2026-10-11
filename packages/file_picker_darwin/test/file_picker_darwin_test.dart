@@ -117,7 +117,7 @@ void main() {
 
     test('pickFile and pickFiles send orderedSelection', () async {
       final picker = FilePickerDarwin();
-      bool? received;
+      bool? orderedSelection;
 
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(picker.methodChannel, (call) async {
