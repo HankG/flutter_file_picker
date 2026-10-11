@@ -496,12 +496,22 @@ final class IOSFilePickerHandler: NSObject,
         let provider = item.itemProvider
         var name = provider.suggestedName ?? assetIdentifier
         // Use the extension of the first image or video representation. A Live
-        // Photo registers its bundle type first, whose extension is ".pvt".
+        // Photo registers its bundle type first, and its suggested name may
+        // already end in that bundle's ".pvt" extension, so replace any
+        // extension that is not an image or video one.
+        func isMedia(_ type: UTType) -> Bool {
+            type.conforms(to: .image) || type.conforms(to: .movie)
+        }
         let mediaType = provider.registeredTypeIdentifiers
             .compactMap { UTType($0) }
-            .first { $0.conforms(to: .image) || $0.conforms(to: .movie) }
-        if (name as NSString).pathExtension.isEmpty,
-           let ext = mediaType?.preferredFilenameExtension {
+            .first(where: isMedia)
+        let currentExtension = (name as NSString).pathExtension
+        let hasMediaExtension = UTType(filenameExtension: currentExtension)
+            .map(isMedia) ?? false
+        if !hasMediaExtension, let ext = mediaType?.preferredFilenameExtension {
+            if !currentExtension.isEmpty {
+                name = (name as NSString).deletingPathExtension
+            }
             name += ".\(ext)"
         }
 
