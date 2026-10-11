@@ -1,3 +1,7 @@
+## 2.2.0
+
+- Added support for `DarwinOptions.orderedSelection`. Setting it to `false` restores swipe to select in the iOS photo library picker, which ordered selection disables. [#2241](https://github.com/vicajilau/flutter_file_picker/issues/2241)
+
 ## 2.1.4
 
 - Fixed a partial swipe down on the iOS picker sheet completing the pick as cancelled while the picker stayed open, which dropped the files selected afterwards. [#2243](https://github.com/vicajilau/flutter_file_picker/issues/2243)
