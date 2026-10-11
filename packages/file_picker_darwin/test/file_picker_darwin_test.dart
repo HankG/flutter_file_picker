@@ -121,7 +121,8 @@ void main() {
 
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(picker.methodChannel, (call) async {
-            received = (call.arguments as Map)['orderedSelection'] as bool?;
+            orderedSelection =
+                (call.arguments as Map)['orderedSelection'] as bool?;
             return <Map<Object?, Object?>>[];
           });
       addTearDown(() {
@@ -130,19 +131,22 @@ void main() {
       });
 
       await picker.pickFiles(type: FileType.media);
-      expect(received, isTrue);
+      expect(orderedSelection, isTrue);
 
       await picker.pickFiles(
         type: FileType.media,
         darwinOptions: const DarwinOptions(orderedSelection: false),
       );
-      expect(received, isFalse);
+      expect(orderedSelection, isFalse);
+
+      await picker.pickFile(type: FileType.media);
+      expect(orderedSelection, isTrue);
 
       await picker.pickFile(
         type: FileType.media,
         darwinOptions: const DarwinOptions(orderedSelection: false),
       );
-      expect(received, isFalse);
+      expect(orderedSelection, isFalse);
     });
 
     test(
