@@ -1,6 +1,6 @@
 ## 4.2.0
 
-- Added `retrieveLostData()` and `LostFilePickerResult`, to recover a pick whose app was restarted before it completed. The default implementation returns `null`. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)
+- Added `retrieveLostData()` and `LostFilePickerResult`, to recover a pick whose app was restarted before it completed. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)
 
 ## 4.1.0
 
