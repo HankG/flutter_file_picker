@@ -162,6 +162,18 @@ void main() {
         expect(file.assetIdentifier, isNull);
       });
 
+      test('appears in toString only when set', () {
+        final asset = DarwinPlatformFile.fromMap({
+          'uri': 'ph://ABC-123/L0/001',
+          'name': 'IMG_0001.HEIC',
+          'assetIdentifier': 'ABC-123/L0/001',
+        });
+        final file = DarwinPlatformFile.fromMap({'path': '/tmp/a.pdf'});
+
+        expect(asset.toString(), contains('assetIdentifier: ABC-123/L0/001'));
+        expect(file.toString(), isNot(contains('assetIdentifier')));
+      });
+
       test('references the asset without a readable copy', () async {
         final file = DarwinPlatformFile.fromMap({
           'uri': 'ph://ABC-123/L0/001',

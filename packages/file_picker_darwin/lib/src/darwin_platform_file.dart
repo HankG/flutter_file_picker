@@ -130,6 +130,9 @@ base class DarwinPlatformFile extends PlatformFile {
 
   @override
   String toString() {
-    return 'DarwinPlatformFile(name: $name, uri: $uri)';
+    final asset = assetIdentifier == null
+        ? ''
+        : ', assetIdentifier: $assetIdentifier';
+    return 'DarwinPlatformFile(name: $name, uri: $uri$asset)';
   }
 }
