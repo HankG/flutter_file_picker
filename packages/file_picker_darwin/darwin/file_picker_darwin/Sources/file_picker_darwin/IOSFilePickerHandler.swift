@@ -486,7 +486,7 @@ final class IOSFilePickerHandler: NSObject,
     }
 
     /// Describes a picked photo library asset without copying it, by its
-    /// `assetIdentifier` and a `ph://` URI. Returns `nil` for results that do
+    /// `assetIdentifier` and a `ph:///` URI. Returns `nil` for results that do
     /// not come from the photo library and so have no identifier.
     private func makeAssetInfo(from item: PHPickerResult) -> [String: Any]? {
         guard let assetIdentifier = item.assetIdentifier else {
@@ -516,7 +516,9 @@ final class IOSFilePickerHandler: NSObject,
         }
 
         return [
-            "uri": "ph://\(assetIdentifier)",
+            // Three slashes keep the identifier out of the URI host, which
+            // would be lowercased and stop matching the identifier.
+            "uri": "ph:///\(assetIdentifier)",
             "name": name,
             "assetIdentifier": assetIdentifier,
         ]

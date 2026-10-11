@@ -164,7 +164,7 @@ void main() {
 
       test('appears in toString only when set', () {
         final asset = DarwinPlatformFile.fromMap({
-          'uri': 'ph://ABC-123/L0/001',
+          'uri': 'ph:///ABC-123/L0/001',
           'name': 'IMG_0001.HEIC',
           'assetIdentifier': 'ABC-123/L0/001',
         });
@@ -176,12 +176,13 @@ void main() {
 
       test('references the asset without a readable copy', () async {
         final file = DarwinPlatformFile.fromMap({
-          'uri': 'ph://ABC-123/L0/001',
+          'uri': 'ph:///ABC-123/L0/001',
           'name': 'IMG_0001.HEIC',
           'assetIdentifier': 'ABC-123/L0/001',
         });
 
         expect(file.uri.scheme, 'ph');
+        expect(file.uri.path, '/ABC-123/L0/001');
         expect(file.path, isNull);
         expect(file.name, 'IMG_0001.HEIC');
         expect(file.assetIdentifier, 'ABC-123/L0/001');

@@ -54,7 +54,7 @@ class DarwinOptions {
   ///
   /// Set it to `false` to skip the copy, for example to avoid duplicating
   /// large videos. Each picked item then only carries its photo library
-  /// identifier, `DarwinPlatformFile.assetIdentifier`, and a `ph://` URI, and
+  /// identifier, `DarwinPlatformFile.assetIdentifier`, and a `ph:///` URI, and
   /// its content cannot be read through the returned file: open the original
   /// asset by its identifier instead, which needs photo library access.
   ///
