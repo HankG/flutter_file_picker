@@ -182,6 +182,35 @@ class FilePickerAndroid extends FilePickerPlatform {
     return null;
   }
 
+  /// Recovers the files picked before Android destroyed the activity, or the
+  /// whole app process, while the file picker was open.
+  ///
+  /// Only `pickFile()` and `pickFiles()` can be recovered. The outcome is
+  /// delivered once, and only the most recent lost pick is kept.
+  @override
+  Future<LostFilePickerResult?> retrieveLostData() async {
+    final Map<Object?, Object?>? data = await methodChannel
+        .invokeMapMethod<Object?, Object?>('retrieveLostData');
+    if (data == null) return null;
+
+    if (data['errorCode'] case final String code) {
+      return LostFilePickerResult(
+        exception: PlatformException(
+          code: code,
+          message: data['errorMessage'] as String?,
+        ),
+      );
+    }
+
+    final files = (data['files'] as List<Object?>?) ?? const [];
+    return LostFilePickerResult(
+      files: [
+        for (final file in files.whereType<Map<Object?, Object?>>())
+          AndroidPlatformFile.fromMap(file),
+      ],
+    );
+  }
+
   @override
   Future<void> clearTemporaryFiles() async {
     await methodChannel.invokeMethod<void>('clear');

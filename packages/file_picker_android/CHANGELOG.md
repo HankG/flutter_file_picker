@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Fixed the files picked with `pickFile()` or `pickFiles()` being lost when Android destroys the activity while the picker is open. They can now be recovered with `retrieveLostData()`. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)
+
 ## 2.0.1
 
 - Fixed `pickFileAndDirectoryPaths()` returning percent-encoded paths that do not exist. [#2225](https://github.com/vicajilau/flutter_file_picker/issues/2225)

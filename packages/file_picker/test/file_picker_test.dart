@@ -42,6 +42,13 @@ class MockFilePickerPlatform extends FilePickerPlatform
   }
 
   @override
+  Future<LostFilePickerResult?> retrieveLostData() async {
+    return LostFilePickerResult(
+      files: [TestPlatformFile(name: 'lost.txt', path: '/path/to/lost.txt')],
+    );
+  }
+
+  @override
   Future<PlatformFile?> pickFile({
     String? dialogTitle,
     String? initialDirectory,
@@ -105,6 +112,16 @@ void main() {
     await FilePicker.skipEntitlementsChecks();
 
     expect(mockPlatform.skipEntitlementsChecksCalled, isTrue);
+  });
+
+  test('FilePicker.retrieveLostData delegates to '
+      'FilePickerPlatform.instance.retrieveLostData', () async {
+    FilePickerPlatform.instance = MockFilePickerPlatform();
+
+    final lost = await FilePicker.retrieveLostData();
+
+    expect(lost?.files.single.name, 'lost.txt');
+    expect(lost?.exception, isNull);
   });
 
   group('FilePicker Darwin options', () {

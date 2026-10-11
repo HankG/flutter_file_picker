@@ -194,6 +194,28 @@ Sets the confirm button text of the file dialog. Supported on Windows
 four), and macOS (`pickFile()`/`pickFiles()` only). Has no effect on iOS,
 Android, or Web.
 
+#### Recover a pick on Android
+
+On low memory devices, Android can destroy the app while the file picker is
+open, so the pending `pickFile()` or `pickFiles()` call never completes.
+The picked files are kept, and can be recovered once the app is restarted:
+
+```dart
+final lost = await FilePicker.retrieveLostData();
+if (lost != null) {
+  if (lost.exception != null) {
+    // Picking succeeded but processing the files failed.
+  } else {
+    // Use lost.files as if pickFiles() had returned them.
+  }
+}
+```
+
+Call it early, for example in the `initState` of the screen that started the
+pick, which a `RestorationScope` can bring back. The result is delivered once,
+and only the most recent lost pick is kept. To reproduce it, enable
+"Don't keep activities" in the Android developer options.
+
 #### Pick a directory
 
 ```dart

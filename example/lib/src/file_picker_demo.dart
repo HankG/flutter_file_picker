@@ -77,6 +77,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       _supportsSafOptions = true;
     }
+    _retrieveLostData();
   }
 
   @override
@@ -157,25 +158,50 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
       _isLoading = false;
       _userAborted = hasUserAborted;
 
-      void updateResults() {
-        _resultsWidget = PickedFilesResults(
-          pickedFiles: pickedFiles,
-          onRemoveAndroidFile:
-              (int index, AndroidPlatformFile androidPlatformFile) {
-                androidPlatformFile.safHandle?.releaseGrant();
-                _scaffoldMessengerKey.currentState?.showSnackBar(
-                  const SnackBar(content: Text("SAF Permission Released!")),
-                );
-                setState(() {
-                  pickedFiles.removeAt(index);
-                  updateResults();
-                });
-              },
-        );
-      }
-
-      updateResults();
+      _updatePickedFilesResults();
     });
+  }
+
+  void _updatePickedFilesResults() {
+    _resultsWidget = PickedFilesResults(
+      pickedFiles: pickedFiles,
+      onRemoveAndroidFile:
+          (int index, AndroidPlatformFile androidPlatformFile) {
+            androidPlatformFile.safHandle?.releaseGrant();
+            _scaffoldMessengerKey.currentState?.showSnackBar(
+              const SnackBar(content: Text("SAF Permission Released!")),
+            );
+            setState(() {
+              pickedFiles.removeAt(index);
+              _updatePickedFilesResults();
+            });
+          },
+    );
+  }
+
+  /// Recovers files picked before Android destroyed the activity, for example
+  /// with "Don't keep activities" enabled in the developer options.
+  Future<void> _retrieveLostData() async {
+    final lost = await FilePicker.retrieveLostData();
+    if (lost == null || !mounted) return;
+
+    if (lost.exception case final error?) {
+      _logException('Recovered a lost pick that failed: ${error.message}');
+      return;
+    }
+
+    setState(() {
+      pickedFiles = lost.files;
+      _updatePickedFilesResults();
+    });
+    _scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(
+          'Recovered ${lost.files.length} file(s) picked before the app was '
+          'restarted',
+        ),
+      ),
+    );
   }
 
   void _pickFileAndDirectoryPaths() async {

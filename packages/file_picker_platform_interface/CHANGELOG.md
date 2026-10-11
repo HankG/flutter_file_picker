@@ -1,3 +1,7 @@
+## 4.2.0
+
+- Added `retrieveLostData()` and `LostFilePickerResult`, to recover a pick whose app was restarted before it completed. The default implementation returns `null`. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)
+
 ## 4.1.0
 
 - Added `DarwinOptions.orderedSelection`, `true` by default. Set it to `false` to restore swipe to select in the iOS photo library picker. [#2241](https://github.com/vicajilau/flutter_file_picker/issues/2241)
