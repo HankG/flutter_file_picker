@@ -19,6 +19,7 @@ final class IOSFilePickerHandler: NSObject,
     private var allowMultipleSelection = false
     private var assetRepresentationMode = PHPickerConfiguration.AssetRepresentationMode.automatic
     private var orderedSelection = true
+    private var copyMedia = true
     private var isDirectoryPicker = false
     private var isFileAndDirectoryPicker = false
     private var isSaveFile = false
@@ -70,6 +71,7 @@ final class IOSFilePickerHandler: NSObject,
         assetRepresentationMode = resolveAssetRepresentationMode(
             arguments["assetRepresentationMode"] as? String)
         orderedSelection = (arguments["orderedSelection"] as? Bool) ?? true
+        copyMedia = (arguments["copyMedia"] as? Bool) ?? true
 
         switch call.method {
         case "any":
@@ -152,6 +154,15 @@ final class IOSFilePickerHandler: NSObject,
             return
         }
 
+        // Without a copy, only the photo library identifier is returned, so
+        // apps can open the original asset later without duplicating storage.
+        if !copyMedia {
+            let assets = results.compactMap { makeAssetInfo(from: $0) }
+            currentResult(assets.isEmpty ? nil : assets)
+            result = nil
+            return
+        }
+
         eventSink?(true)
         let group = DispatchGroup()
         var resolved = Array<[String: Any]?>(repeating: nil, count: results.count)
@@ -168,7 +179,10 @@ final class IOSFilePickerHandler: NSObject,
                 else {
                     return
                 }
-                if let fileInfo = self.makeFileInfo(from: copiedURL) {
+                if var fileInfo = self.makeFileInfo(from: copiedURL) {
+                    if let assetIdentifier = item.assetIdentifier {
+                        fileInfo["assetIdentifier"] = assetIdentifier
+                    }
                     resolvedLock.lock()
                     resolved[index] = fileInfo
                     resolvedLock.unlock()
@@ -469,6 +483,29 @@ final class IOSFilePickerHandler: NSObject,
         }
 
         return contents.first { imageExtensions.contains($0.pathExtension.lowercased()) }
+    }
+
+    /// Describes a picked photo library asset without copying it, by its
+    /// `assetIdentifier` and a `ph://` URI. Returns `nil` for results that do
+    /// not come from the photo library and so have no identifier.
+    private func makeAssetInfo(from item: PHPickerResult) -> [String: Any]? {
+        guard let assetIdentifier = item.assetIdentifier else {
+            return nil
+        }
+
+        let provider = item.itemProvider
+        var name = provider.suggestedName ?? assetIdentifier
+        if (name as NSString).pathExtension.isEmpty,
+           let typeIdentifier = provider.registeredTypeIdentifiers.first,
+           let ext = UTType(typeIdentifier)?.preferredFilenameExtension {
+            name += ".\(ext)"
+        }
+
+        return [
+            "uri": "ph://\(assetIdentifier)",
+            "name": name,
+            "assetIdentifier": assetIdentifier,
+        ]
     }
 
     private func makeFileInfo(from fileURL: URL) -> [String: Any]? {

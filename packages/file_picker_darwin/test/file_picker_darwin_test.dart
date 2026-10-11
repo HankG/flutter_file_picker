@@ -115,6 +115,73 @@ void main() {
       expect(receivedLabel, isNull);
     });
 
+    test('pickFile and pickFiles send copyMedia', () async {
+      final picker = FilePickerDarwin();
+      bool? copyMedia;
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(picker.methodChannel, (call) async {
+            copyMedia = (call.arguments as Map)['copyMedia'] as bool?;
+            return <Map<Object?, Object?>>[];
+          });
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(picker.methodChannel, null);
+      });
+
+      await picker.pickFiles(type: FileType.media);
+      expect(copyMedia, isTrue);
+
+      await picker.pickFiles(
+        type: FileType.media,
+        darwinOptions: const DarwinOptions(copyMedia: false),
+      );
+      expect(copyMedia, isFalse);
+
+      await picker.pickFile(
+        type: FileType.media,
+        darwinOptions: const DarwinOptions(copyMedia: false),
+      );
+      expect(copyMedia, isFalse);
+    });
+
+    group('DarwinPlatformFile asset identifier', () {
+      test('is kept alongside a copied file', () {
+        final file = DarwinPlatformFile.fromMap({
+          'path': '/tmp/IMG_0001.HEIC',
+          'name': 'IMG_0001.HEIC',
+          'assetIdentifier': 'ABC-123/L0/001',
+        });
+
+        expect(file.assetIdentifier, 'ABC-123/L0/001');
+        expect(file.uri.scheme, 'file');
+      });
+
+      test('is null for files outside the photo library', () {
+        final file = DarwinPlatformFile.fromMap({'path': '/tmp/a.pdf'});
+        expect(file.assetIdentifier, isNull);
+      });
+
+      test('references the asset without a readable copy', () async {
+        final file = DarwinPlatformFile.fromMap({
+          'uri': 'ph://ABC-123/L0/001',
+          'name': 'IMG_0001.HEIC',
+          'assetIdentifier': 'ABC-123/L0/001',
+        });
+
+        expect(file.uri.scheme, 'ph');
+        expect(file.path, isNull);
+        expect(file.name, 'IMG_0001.HEIC');
+        expect(file.assetIdentifier, 'ABC-123/L0/001');
+        expect(await file.length(), isNull);
+        await expectLater(file.readAsBytes(), throwsUnsupportedError);
+        await expectLater(
+          file.readAsByteStream().toList(),
+          throwsUnsupportedError,
+        );
+      });
+    });
+
     test('pickFile and pickFiles send orderedSelection', () async {
       final picker = FilePickerDarwin();
       bool? orderedSelection;
