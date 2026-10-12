@@ -65,8 +65,9 @@ base class DarwinPlatformFile extends PlatformFile {
   final String? assetIdentifier;
 
   /// Whether this file only references a photo library asset, picked with
-  /// `DarwinOptions(copyMedia: false)`, and has no readable copy.
-  bool get _isAssetReference => uri.scheme == 'ph';
+  /// `DarwinOptions(copyMedia: false)`, and has no readable copy: a `ph` URI
+  /// and no [XFile] to read it through.
+  bool get _isAssetReference => uri.scheme == 'ph' && _xFile == null;
 
   UnsupportedError get _assetReferenceError => UnsupportedError(
     'This file was picked with DarwinOptions(copyMedia: false), so it has no '

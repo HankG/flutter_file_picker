@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:file_picker_darwin/file_picker_darwin.dart';
 import 'package:file_picker_platform_interface/file_picker_platform_interface.dart';
 import 'package:flutter/foundation.dart';
@@ -138,6 +139,9 @@ void main() {
       );
       expect(copyMedia, isFalse);
 
+      await picker.pickFile(type: FileType.media);
+      expect(copyMedia, isTrue);
+
       await picker.pickFile(
         type: FileType.media,
         darwinOptions: const DarwinOptions(copyMedia: false),
@@ -160,6 +164,23 @@ void main() {
       test('is null for files outside the photo library', () {
         final file = DarwinPlatformFile.fromMap({'path': '/tmp/a.pdf'});
         expect(file.assetIdentifier, isNull);
+      });
+
+      test('reads through its own XFile even with a ph URI', () async {
+        final dir = Directory.systemTemp.createTempSync('file_picker_test');
+        addTearDown(() => dir.deleteSync(recursive: true));
+        final copy = File('${dir.path}/IMG_0001.HEIC')
+          ..writeAsBytesSync([1, 2, 3]);
+
+        final file = DarwinPlatformFile(
+          name: 'IMG_0001.HEIC',
+          uri: Uri.parse('ph:///ABC-123/L0/001'),
+          assetIdentifier: 'ABC-123/L0/001',
+          xFile: XFile(copy.path),
+        );
+
+        expect(await file.readAsBytes(), [1, 2, 3]);
+        expect(await file.length(), 3);
       });
 
       test('appears in toString only when set', () {
@@ -187,10 +208,17 @@ void main() {
         expect(file.name, 'IMG_0001.HEIC');
         expect(file.assetIdentifier, 'ABC-123/L0/001');
         expect(await file.length(), isNull);
-        await expectLater(file.readAsBytes(), throwsUnsupportedError);
+        final throwsAssetReferenceError = throwsA(
+          isA<UnsupportedError>().having(
+            (e) => e.message,
+            'message',
+            contains('DarwinOptions(copyMedia: false)'),
+          ),
+        );
+        await expectLater(file.readAsBytes(), throwsAssetReferenceError);
         await expectLater(
           file.readAsByteStream().toList(),
-          throwsUnsupportedError,
+          throwsAssetReferenceError,
         );
       });
     });
