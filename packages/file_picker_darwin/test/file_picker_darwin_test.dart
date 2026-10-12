@@ -212,7 +212,9 @@ void main() {
           isA<UnsupportedError>().having(
             (e) => e.message,
             'message',
-            contains('DarwinOptions(copyMedia: false)'),
+            'This file was picked with DarwinOptions(copyMedia: false), so it '
+                'has no readable copy. Open the original asset by its '
+                'assetIdentifier instead.',
           ),
         );
         await expectLater(file.readAsBytes(), throwsAssetReferenceError);
