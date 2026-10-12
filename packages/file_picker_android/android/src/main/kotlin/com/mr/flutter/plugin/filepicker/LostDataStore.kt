@@ -1,6 +1,7 @@
 package com.mr.flutter.plugin.filepicker
 
 import android.content.Context
+import io.flutter.plugin.common.MethodChannel
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -19,6 +20,67 @@ object LostDataStore {
     private const val KEY_REQUEST = "pending_request"
     private const val KEY_RESULT = "lost_result"
 
+    // True while the result of a restored request is being processed, which
+    // includes copying the picked files and can take a while.
+    private var restoring = false
+
+    // A retrieveLostData call that arrived while restoring. It is answered
+    // once the restored result has been stored.
+    private var waitingResult: MethodChannel.Result? = null
+
+    /** Whether the result of a restored request is being processed. */
+    val isRestoring: Boolean
+        @Synchronized get() = restoring
+
+    /**
+     * Starts restoring the request whose activity was destroyed while the
+     * picker was open, and returns its options, or `null` if there is none.
+     */
+    @Synchronized
+    fun beginRestore(context: Context): PendingRequest? {
+        val request = loadRequest(context) ?: return null
+        restoring = true
+        return request
+    }
+
+    /**
+     * Stores the files of the restored request, or nothing if the pick was
+     * cancelled ([files] is `null`), and finishes restoring.
+     */
+    @Synchronized
+    fun finishRestore(context: Context, files: List<FileInfo>?) {
+        if (files != null) saveFiles(context, files) else clearRequest(context)
+        endRestore(context)
+    }
+
+    /** Stores the error of the restored request and finishes restoring. */
+    @Synchronized
+    fun finishRestoreWithError(context: Context, code: String, message: String?) {
+        saveError(context, code, message)
+        endRestore(context)
+    }
+
+    /**
+     * Answers [result] with the stored outcome of a lost pick, or `null`.
+     * Waits if a restored result is still being processed.
+     */
+    @Synchronized
+    fun retrieve(context: Context, result: MethodChannel.Result) {
+        if (restoring) {
+            waitingResult = result
+        } else {
+            result.success(takeResult(context))
+        }
+    }
+
+    private fun endRestore(context: Context) {
+        restoring = false
+        waitingResult?.let {
+            waitingResult = null
+            it.success(takeResult(context))
+        }
+    }
+
     /** The options of a pick request, enough to process its result later. */
     data class PendingRequest(
         val type: String,
@@ -34,7 +96,7 @@ object LostDataStore {
         prefs(context).edit().putString(KEY_REQUEST, json.toString()).apply()
     }
 
-    fun loadRequest(context: Context): PendingRequest? {
+    private fun loadRequest(context: Context): PendingRequest? {
         val raw = prefs(context).getString(KEY_REQUEST, null) ?: return null
         return try {
             val json = JSONObject(raw)
@@ -53,14 +115,14 @@ object LostDataStore {
     }
 
     /** Stores the files of an orphaned pick, replacing any previous one. */
-    fun saveFiles(context: Context, files: List<FileInfo>) {
+    private fun saveFiles(context: Context, files: List<FileInfo>) {
         val array = JSONArray()
         files.forEach { array.put(JSONObject(it.toMap())) }
         storeResult(context, JSONObject().put("files", array))
     }
 
     /** Stores the error of an orphaned pick, replacing any previous one. */
-    fun saveError(context: Context, code: String, message: String?) {
+    private fun saveError(context: Context, code: String, message: String?) {
         storeResult(
             context,
             JSONObject().put("errorCode", code).put("errorMessage", message)
@@ -71,7 +133,7 @@ object LostDataStore {
      * Returns the stored result as a map for the method channel, or `null`
      * when there is none, and clears it so it is only delivered once.
      */
-    fun takeResult(context: Context): HashMap<String, Any?>? {
+    private fun takeResult(context: Context): HashMap<String, Any?>? {
         val prefs = prefs(context)
         val raw = prefs.getString(KEY_RESULT, null) ?: return null
         prefs.edit().remove(KEY_RESULT).apply()

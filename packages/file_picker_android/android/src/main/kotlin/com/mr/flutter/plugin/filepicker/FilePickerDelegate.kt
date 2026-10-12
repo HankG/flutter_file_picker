@@ -41,27 +41,6 @@ class FilePickerDelegate(
     var saveMimeType: String? = null
     var androidSafOptions: java.util.HashMap<*, *>? = null
 
-    // True while processing a pick result whose request was lost, because
-    // Android destroyed the activity while the picker was open. Its outcome is
-    // stored in LostDataStore for retrieveLostData instead of being dropped.
-    private var restoringLostResult = false
-
-    // A retrieveLostData call that arrived while a restored result was still
-    // being processed. It is answered once that processing finishes.
-    private var lostDataResult: MethodChannel.Result? = null
-
-    /**
-     * Answers [result] with the stored outcome of a pick whose activity was
-     * destroyed, or `null`. Waits if that outcome is still being processed.
-     */
-    fun retrieveLostData(result: MethodChannel.Result) {
-        if (restoringLostResult) {
-            lostDataResult = result
-            return
-        }
-        result.success(LostDataStore.takeResult(activity.applicationContext))
-    }
-
     fun setEventHandler(eventSink: EventSink?) {
         this.eventSink = eventSink
     }
@@ -144,11 +123,10 @@ class FilePickerDelegate(
      * picker was open. Returns `false` when there is nothing to restore.
      */
     private fun restoreLostRequest(): Boolean {
-        val request = LostDataStore.loadRequest(activity.applicationContext) ?: return false
+        val request = LostDataStore.beginRestore(activity.applicationContext) ?: return false
         type = request.type
         compressionQuality = request.compressionQuality
         androidSafOptions = request.androidSafOptions
-        restoringLostResult = true
         return true
     }
 
@@ -163,15 +141,13 @@ class FilePickerDelegate(
 
     fun finishWithSuccess(data: Any?) {
         dispatchEventStatus(false)
-        if (finishLostResult { context ->
-                val files = (data as? ArrayList<*>)?.filterIsInstance<FileInfo>()
-                if (files != null) {
-                    LostDataStore.saveFiles(context, files)
-                } else {
-                    LostDataStore.clearRequest(context)
-                }
-            }) return
-        LostDataStore.clearRequest(activity.applicationContext)
+        val context = activity.applicationContext
+        if (isLostResult()) {
+            val files = (data as? ArrayList<*>)?.filterIsInstance<FileInfo>()
+            LostDataStore.finishRestore(context, files)
+            return
+        }
+        LostDataStore.clearRequest(context)
         pendingResult?.let {
             it.success(data?.takeIf { it is String }
                 ?: (data as? ArrayList<*>)?.mapNotNull { (it as? FileInfo)?.toMap() })
@@ -181,10 +157,12 @@ class FilePickerDelegate(
 
     fun finishWithError(errorCode: String, errorMessage: String?) {
         dispatchEventStatus(false)
-        if (finishLostResult { context ->
-                LostDataStore.saveError(context, errorCode, errorMessage)
-            }) return
-        LostDataStore.clearRequest(activity.applicationContext)
+        val context = activity.applicationContext
+        if (isLostResult()) {
+            LostDataStore.finishRestoreWithError(context, errorCode, errorMessage)
+            return
+        }
+        LostDataStore.clearRequest(context)
         pendingResult?.error(errorCode, errorMessage, null)
         clearPendingResult()
     }
@@ -196,20 +174,10 @@ class FilePickerDelegate(
     }
 
     /**
-     * Stores the outcome of a restored request through [store] and returns
-     * `true`, or returns `false` when this is a regular request.
+     * Whether the result being finished belongs to a restored request, whose
+     * outcome goes to LostDataStore instead of a pending method call.
      */
-    private fun finishLostResult(store: (android.content.Context) -> Unit): Boolean {
-        if (pendingResult != null || !restoringLostResult) return false
-        restoringLostResult = false
-        val context = activity.applicationContext
-        store(context)
-        lostDataResult?.let {
-            lostDataResult = null
-            it.success(LostDataStore.takeResult(context))
-        }
-        return true
-    }
+    private fun isLostResult(): Boolean = pendingResult == null && LostDataStore.isRestoring
 
     private fun clearPendingResult() {
         pendingResult = null

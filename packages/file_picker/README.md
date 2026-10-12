@@ -196,8 +196,9 @@ Android, or Web.
 
 #### Recover a pick on Android
 
-On low memory devices, Android can destroy the app while the file picker is
-open, so the pending `pickFile()` or `pickFiles()` call never completes.
+When the operating system is low on memory, Android can destroy the app while
+the file picker is open, so the pending `pickFile()` or `pickFiles()` call
+never completes.
 The picked files are kept, and can be recovered once the app is restarted
 through `FilePickerAndroid`, which comes from `package:android_file_picker`:
 

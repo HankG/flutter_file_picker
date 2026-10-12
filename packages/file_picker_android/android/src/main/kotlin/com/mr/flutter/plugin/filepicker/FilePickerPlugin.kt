@@ -128,11 +128,11 @@ class FilePickerPlugin : MethodCallHandler, FlutterPlugin,
             }
 
             "retrieveLostData" -> {
-                val currentDelegate = delegate
-                if (currentDelegate == null) {
+                val context = activity?.applicationContext
+                if (context == null) {
                     result.success(null)
                 } else {
-                    currentDelegate.retrieveLostData(result)
+                    LostDataStore.retrieve(context, result)
                 }
             }
 
