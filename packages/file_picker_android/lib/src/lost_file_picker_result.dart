@@ -1,14 +1,15 @@
+import 'package:file_picker_platform_interface/file_picker_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'platform_file.dart';
+import 'file_picker_android.dart';
 
 /// The outcome of a pick whose app was restarted before it completed.
 ///
-/// On Android, the system can destroy the activity, or the whole app process,
-/// while the file picker is open, for example on low memory devices. The
-/// files the user picked are then delivered to a fresh instance of the app,
-/// which can recover them through `FilePicker.retrieveLostData()`.
+/// Android can destroy the activity, or the whole app process, while the file
+/// picker is open, for example on low memory devices. The files the user
+/// picked are then delivered to a fresh instance of the app, which can
+/// recover them through [FilePickerAndroid.retrieveLostData].
 @immutable
 class LostFilePickerResult {
   /// Creates a [LostFilePickerResult] with the picked [files] or the

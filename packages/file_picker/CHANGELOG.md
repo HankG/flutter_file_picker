@@ -1,7 +1,3 @@
-## 13.2.0
-
-- Added `FilePicker.retrieveLostData()`, to recover the files picked on Android when the system destroys the app while the picker is open. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)
-
 ## 13.1.0
 
 - Added support for UIScene on iOS.

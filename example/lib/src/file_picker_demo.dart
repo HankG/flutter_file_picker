@@ -182,11 +182,14 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
   /// Recovers files picked before Android destroyed the activity, for example
   /// with "Don't keep activities" enabled in the developer options.
   Future<void> _retrieveLostData() async {
-    final lost = await FilePicker.retrieveLostData();
+    final platform = FilePickerPlatform.instance;
+    if (platform is! FilePickerAndroid) return;
+
+    final lost = await platform.retrieveLostData();
     if (lost == null || !mounted) return;
 
     if (lost.exception case final error?) {
-      _logException('Recovered a lost pick that failed: ${error.message}');
+      _logException('Could not recover the lost pick: ${error.message}');
       return;
     }
 

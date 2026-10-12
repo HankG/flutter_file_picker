@@ -10,7 +10,6 @@ import 'file_picker_options/darwin_options.dart';
 import 'file_picker_options/linux_options.dart';
 import 'file_picker_options/web_options.dart';
 import 'file_picker_options/windows_options.dart';
-import 'lost_file_picker_result.dart';
 import 'method_channel_file_picker.dart';
 import 'platform_file.dart';
 
@@ -142,14 +141,6 @@ abstract class FilePickerPlatform extends PlatformInterface {
   /// Default implementation is a no-op for platforms that do not perform
   /// entitlement checks.
   Future<void> skipEntitlementsChecks() async {}
-
-  /// Recovers the outcome of a pick whose app was restarted before it
-  /// completed, or `null` if there is none.
-  ///
-  /// Only Android can destroy the app while its file picker is open, so the
-  /// default implementation always returns `null`. The outcome is delivered
-  /// once: later calls return `null` until another pick is lost.
-  Future<LostFilePickerResult?> retrieveLostData() async => null;
 
   /// Save the given [bytes] to a file with the given [fileName], using the native save file dialog.
   ///

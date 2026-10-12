@@ -198,15 +198,18 @@ Android, or Web.
 
 On low memory devices, Android can destroy the app while the file picker is
 open, so the pending `pickFile()` or `pickFiles()` call never completes.
-The picked files are kept, and can be recovered once the app is restarted:
+The picked files are kept, and can be recovered once the app is restarted
+through `FilePickerAndroid`, which comes from `package:android_file_picker`:
 
 ```dart
-final lost = await FilePicker.retrieveLostData();
-if (lost != null) {
-  if (lost.exception != null) {
-    // Picking succeeded but processing the files failed.
-  } else {
-    // Use lost.files as if pickFiles() had returned them.
+if (FilePickerPlatform.instance case final FilePickerAndroid android) {
+  final lost = await android.retrieveLostData();
+  if (lost != null) {
+    if (lost.exception != null) {
+      // Picking succeeded but processing the files failed.
+    } else {
+      // Use lost.files as if pickFiles() had returned them.
+    }
   }
 }
 ```

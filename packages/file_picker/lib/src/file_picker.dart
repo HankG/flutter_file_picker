@@ -192,34 +192,6 @@ abstract final class FilePicker {
     );
   }
 
-  /// Recovers the files picked before the app was restarted, or `null` if
-  /// there is nothing to recover.
-  ///
-  /// On Android, the system can destroy the activity, or the whole app
-  /// process, while the file picker is open, for example on low memory
-  /// devices. The pending `pickFile()` or `pickFiles()` call never completes,
-  /// but the files the user picked are kept and can be recovered here once
-  /// the app is restarted. Call it early, for example in the `initState` of
-  /// the screen that started the pick, which can be brought back with a
-  /// `RestorationScope`:
-  ///
-  /// ```dart
-  /// final lost = await FilePicker.retrieveLostData();
-  /// if (lost != null) {
-  ///   if (lost.exception != null) {
-  ///     // Picking succeeded but processing the files failed.
-  ///   } else {
-  ///     // Use lost.files as if pickFiles() had returned them.
-  ///   }
-  /// }
-  /// ```
-  ///
-  /// The outcome is delivered once, and only the most recent lost pick is
-  /// kept. Returns `null` on every platform other than Android.
-  static Future<LostFilePickerResult?> retrieveLostData() {
-    return FilePickerPlatform.instance.retrieveLostData();
-  }
-
   /// Skips the macOS App Sandbox entitlement checks performed before showing a dialog.
   ///
   /// Only relevant for non-sandboxed macOS apps, which do not declare the

@@ -1,6 +1,6 @@
 ## 2.1.0
 
-- Fixed picked files being lost when Android destroys the activity while the picker is open. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)
+- Added `FilePickerAndroid.retrieveLostData()`, to recover the files picked when Android destroys the activity while the picker is open. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)
 
 ## 2.0.1
 
