@@ -7,9 +7,9 @@ import 'file_picker_android.dart';
 /// The outcome of a file selection, that was interrupted because the calling application was killed by the operating system, due to low memory constraints on the device at the time of the file selection.
 ///
 /// Android can destroy the activity, or the whole app process, while the file
-/// picker is open, for example on low memory devices. The files the user
-/// picked are then delivered to a fresh instance of the app, which can
-/// recover them through [FilePickerAndroid.retrieveLostData].
+/// picker is open. The files the user picked are then delivered to a fresh
+/// instance of the app, which can recover them through
+/// [FilePickerAndroid.retrieveLostData].
 @immutable
 class LostFilePickerResult {
   /// Creates a [LostFilePickerResult] with the picked [files] or the
