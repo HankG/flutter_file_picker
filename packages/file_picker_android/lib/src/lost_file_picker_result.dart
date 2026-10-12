@@ -16,7 +16,7 @@ class LostFilePickerResult {
   /// [exception] that prevented processing them.
   const LostFilePickerResult({this.files = const [], this.exception});
 
-  /// The files the user picked, empty if [exception] is set.
+  /// The files the user picked, or empty if [exception] is set.
   final List<PlatformFile> files;
 
   /// The error raised while processing the picked files, if any.
