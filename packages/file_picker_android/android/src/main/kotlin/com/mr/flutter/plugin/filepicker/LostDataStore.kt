@@ -20,6 +20,13 @@ object LostDataStore {
     private const val KEY_REQUEST = "pending_request"
     private const val KEY_RESULT = "lost_result"
 
+    /** The options of a pick request, enough to process its result later. */
+    data class PendingRequest(
+        val type: String,
+        val compressionQuality: Int,
+        val androidSafOptions: HashMap<*, *>?
+    )
+
     // True while the result of a restored request is being processed, which
     // includes copying the picked files and can take a while.
     private var restoring = false
@@ -31,6 +38,18 @@ object LostDataStore {
     /** Whether the result of a restored request is being processed. */
     val isRestoring: Boolean
         @Synchronized get() = restoring
+
+    fun saveRequest(context: Context, request: PendingRequest) {
+        val json = JSONObject()
+            .put("type", request.type)
+            .put("compressionQuality", request.compressionQuality)
+            .put("androidSafOptions", request.androidSafOptions?.let { JSONObject(it) })
+        prefs(context).edit().putString(KEY_REQUEST, json.toString()).apply()
+    }
+
+    fun clearRequest(context: Context) {
+        prefs(context).edit().remove(KEY_REQUEST).apply()
+    }
 
     /**
      * Starts restoring the request whose activity was destroyed while the
@@ -81,21 +100,6 @@ object LostDataStore {
         }
     }
 
-    /** The options of a pick request, enough to process its result later. */
-    data class PendingRequest(
-        val type: String,
-        val compressionQuality: Int,
-        val androidSafOptions: HashMap<*, *>?
-    )
-
-    fun saveRequest(context: Context, request: PendingRequest) {
-        val json = JSONObject()
-            .put("type", request.type)
-            .put("compressionQuality", request.compressionQuality)
-            .put("androidSafOptions", request.androidSafOptions?.let { JSONObject(it) })
-        prefs(context).edit().putString(KEY_REQUEST, json.toString()).apply()
-    }
-
     private fun loadRequest(context: Context): PendingRequest? {
         val raw = prefs(context).getString(KEY_REQUEST, null) ?: return null
         return try {
@@ -108,10 +112,6 @@ object LostDataStore {
         } catch (e: Exception) {
             null
         }
-    }
-
-    fun clearRequest(context: Context) {
-        prefs(context).edit().remove(KEY_REQUEST).apply()
     }
 
     /** Stores the files of an orphaned pick, replacing any previous one. */
