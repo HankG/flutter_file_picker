@@ -1,3 +1,7 @@
+## 4.2.0
+
+- Added `DarwinOptions.copyMedia`, `true` by default. [#2245](https://github.com/vicajilau/flutter_file_picker/issues/2245)
+
 ## 4.1.0
 
 - Added `DarwinOptions.orderedSelection`, `true` by default. Set it to `false` to restore swipe to select in the iOS photo library picker. [#2241](https://github.com/vicajilau/flutter_file_picker/issues/2241)
