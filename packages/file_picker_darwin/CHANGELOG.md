@@ -1,3 +1,7 @@
+## 2.3.1
+
+- Fixed a pick on iOS where none of the picked items could be loaded completing with an empty list, as if the user had cancelled. It now throws a `PlatformException` with the `load_failed` code. [#2248](https://github.com/vicajilau/flutter_file_picker/issues/2248)
+
 ## 2.3.0
 
 - Added `DarwinPlatformFile.assetIdentifier` for media picked from the iOS photo library, and support for `DarwinOptions(copyMedia: false)` to skip the copy. [#2245](https://github.com/vicajilau/flutter_file_picker/issues/2245)

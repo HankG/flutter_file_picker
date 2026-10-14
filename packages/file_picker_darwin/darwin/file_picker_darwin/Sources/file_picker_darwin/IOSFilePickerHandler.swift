@@ -158,7 +158,7 @@ final class IOSFilePickerHandler: NSObject,
         // apps can open the original asset later without duplicating storage.
         if !copyMedia {
             let assets = results.compactMap { makeAssetInfo(from: $0) }
-            currentResult(assets.isEmpty ? nil : assets)
+            currentResult(assets.isEmpty ? loadFailedError() : assets)
             result = nil
             return
         }
@@ -196,7 +196,7 @@ final class IOSFilePickerHandler: NSObject,
             }
             eventSink?(false)
             let orderedResolved = resolved.compactMap { $0 }
-            currentResult(orderedResolved.isEmpty ? nil : orderedResolved)
+            currentResult(orderedResolved.isEmpty ? loadFailedError() : orderedResolved)
             result = nil
         }
     }
@@ -275,8 +275,23 @@ final class IOSFilePickerHandler: NSObject,
             resolved.append(fileInfo)
         }
 
-        currentResult(resolved.isEmpty ? nil : resolved)
+        if resolved.isEmpty {
+            currentResult(urls.isEmpty ? nil : loadFailedError())
+        } else {
+            currentResult(resolved)
+        }
         result = nil
+    }
+
+    /// The error for a pick where the user picked at least one item but none
+    /// could be loaded, for example photos only stored in iCloud while the
+    /// device is offline. Completing with `nil` instead would look like a
+    /// cancellation to the app.
+    private func loadFailedError() -> FlutterError {
+        FlutterError(
+            code: "load_failed",
+            message: "None of the picked items could be loaded.",
+            details: nil)
     }
 
     private func presentMediaPicker(type: String, allowsMultipleSelection: Bool) {
