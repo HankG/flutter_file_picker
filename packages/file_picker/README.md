@@ -216,6 +216,30 @@ Sets the confirm button text of the file dialog. Supported on Windows
 four), and macOS (`pickFile()`/`pickFiles()` only). Has no effect on iOS,
 Android, or Web.
 
+#### Save dialog on the web
+
+By default `saveFile()` downloads the file on the web, which most browsers
+drop into the Downloads folder. To let the user pick the folder and the file
+name, use the browser's save dialog:
+
+```dart
+await FilePicker.saveFile(
+  fileName: 'report.pdf',
+  bytes: bytes,
+  webOptions: const FilePickerWebOptions(saveMode: WebSaveMode.dialog),
+);
+```
+
+It returns a `Uri` whose path is the chosen file name, since browsers do not
+expose the folder, or `null` if the user cancelled. Only Chromium based
+browsers support the dialog, and it only opens right after a user gesture,
+so it falls back to the download otherwise.
+
+`FilePickerWebOptions` comes from `package:file_picker_web`, which can only be
+imported when compiling for the web. In an app that also targets other
+platforms, build the options in a web only file chosen with a conditional
+import (`if (dart.library.js_interop)`).
+
 #### Recover a pick on Android
 
 When the operating system is low on memory, Android can destroy the app while

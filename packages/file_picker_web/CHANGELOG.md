@@ -1,3 +1,7 @@
+## 4.2.0
+
+- Added `FilePickerWebOptions.saveMode`. `WebSaveMode.dialog` saves through the browser's save dialog, falling back to a download where it is not available. [#1732](https://github.com/vicajilau/flutter_file_picker/issues/1732)
+
 ## 4.1.0
 
 - `readAsByteStream()` now always emits evenly sized chunks of `WebPlatformFile.streamChunkSize` (1 MiB), except the last one, with or without `withReadStream`. With `withReadStream` the chunks used to be 1,000,000 bytes. [#2223](https://github.com/vicajilau/flutter_file_picker/issues/2223)

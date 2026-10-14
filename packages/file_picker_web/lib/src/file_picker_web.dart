@@ -11,6 +11,7 @@ import 'file_picker_web_options.dart';
 import 'indexed_task_runner.dart';
 import 'platform_file_web_fetch.dart';
 import 'preload_policy.dart';
+import 'save_file_dialog.dart';
 import 'web_file_input_session.dart';
 import 'web_platform_file.dart';
 
@@ -223,10 +224,14 @@ class FilePickerWeb extends FilePickerPlatform {
     );
   }
 
-  /// Triggers a browser download to save a file with the given [fileName],
-  /// [bytes], and [mimeType].
+  /// Saves [bytes] as [fileName] with the given [mimeType].
   ///
-  /// Returns a `blob:` [Uri] pointing to the generated download object.
+  /// By default it triggers a browser download and returns `null`. With
+  /// `FilePickerWebOptions(saveMode: WebSaveMode.dialog)` it opens the
+  /// browser's save dialog instead, and returns a [Uri] whose path is the
+  /// file name the user chose, since browsers do not expose the folder, or
+  /// `null` if the user cancelled. When the dialog is not available it falls
+  /// back to the download.
   @override
   Future<Uri?> saveFile({
     required String fileName,
@@ -255,6 +260,23 @@ class FilePickerWeb extends FilePickerPlatform {
       throw ArgumentError(
         'The file name should include a valid file extension.',
       );
+    }
+
+    final FilePickerWebOptions effectiveWebOptions =
+        webOptions is FilePickerWebOptions
+        ? webOptions
+        : const FilePickerWebOptions();
+
+    if (effectiveWebOptions.saveMode == WebSaveMode.dialog) {
+      final dialog = await saveWithDialog(
+        fileName: fileName,
+        bytes: bytes,
+        mimeType: mimeType,
+      );
+      if (dialog.shown) {
+        final name = dialog.name;
+        return name == null ? null : Uri(path: name);
+      }
     }
 
     final blob = Blob([bytes.toJS].toJS, BlobPropertyBag(type: mimeType));

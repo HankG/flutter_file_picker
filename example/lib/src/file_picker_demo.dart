@@ -9,6 +9,8 @@ import 'dart:typed_data';
 import 'file_picker_results.dart';
 import 'picked_directory_result.dart';
 import 'picked_files_results.dart';
+import 'web_save_options.dart'
+    if (dart.library.js_interop) 'web_save_options_web.dart';
 
 class FilePickerDemo extends StatefulWidget {
   const FilePickerDemo({super.key});
@@ -37,6 +39,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
   bool _multiPick = false;
   bool _orderedSelection = true;
   bool _copyMedia = true;
+  bool _saveWithDialog = false;
   bool _safPersist = false;
   bool _safReadWrite = false;
   bool _supportsSafOptions = false;
@@ -363,6 +366,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
         initialDirectory: _initialDirectoryController.text,
         windowsOptions: WindowsOptions(lockParentWindow: _lockParentWindow),
         linuxOptions: LinuxOptions(lockParentWindow: _lockParentWindow),
+        webOptions: webSaveOptions(useDialog: _saveWithDialog),
         bytes: bytes,
       );
       hasUserAborted = pickedSaveFileUri == null;
@@ -697,6 +701,17 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
           ),
           onChanged: (value) => setState(() => _copyMedia = value),
           value: _copyMedia,
+        ),
+      ),
+      ConstrainedBox(
+        constraints: const BoxConstraints.tightFor(width: 400.0),
+        child: SwitchListTile.adaptive(
+          title: const Text(
+            'Save with dialog (web)',
+            textAlign: TextAlign.left,
+          ),
+          onChanged: (value) => setState(() => _saveWithDialog = value),
+          value: _saveWithDialog,
         ),
       ),
       ConstrainedBox(
