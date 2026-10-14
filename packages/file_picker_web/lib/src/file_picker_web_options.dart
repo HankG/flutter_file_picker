@@ -10,7 +10,7 @@ enum WebSaveFileMode {
   /// file name.
   ///
   /// Falls back to [download] when the browser does not support the dialog
-  /// (only Chromium based browsers do) or refuses to open it, which happens
+  /// or refuses to open it, which happens
   /// when `saveFile()` is not called right after a user gesture.
   dialog,
 }
