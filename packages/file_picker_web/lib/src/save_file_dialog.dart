@@ -4,7 +4,9 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:web/web.dart';
 
-// `showSaveFilePicker()` is not part of package:web, since only Chromium
+// `showSaveFilePicker()` is not part of package:web, since it is an experimental API.
+//
+// See https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker#browser_compatibility
 // based browsers implement it.
 @JS('showSaveFilePicker')
 external JSFunction? get _showSaveFilePickerFunction;
