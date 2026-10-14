@@ -158,7 +158,7 @@ final class IOSFilePickerHandler: NSObject,
         // apps can open the original asset later without duplicating storage.
         if !copyMedia {
             let assets = results.compactMap { makeAssetInfo(from: $0) }
-            currentResult(assets.isEmpty ? loadFailedError() : assets)
+            complete(currentResult, pickedCount: results.count, loaded: assets)
             result = nil
             return
         }
@@ -196,7 +196,7 @@ final class IOSFilePickerHandler: NSObject,
             }
             eventSink?(false)
             let orderedResolved = resolved.compactMap { $0 }
-            currentResult(orderedResolved.isEmpty ? loadFailedError() : orderedResolved)
+            complete(currentResult, pickedCount: results.count, loaded: orderedResolved)
             result = nil
         }
     }
@@ -275,12 +275,25 @@ final class IOSFilePickerHandler: NSObject,
             resolved.append(fileInfo)
         }
 
-        if resolved.isEmpty {
-            currentResult(urls.isEmpty ? nil : loadFailedError())
-        } else {
-            currentResult(resolved)
-        }
+        complete(currentResult, pickedCount: urls.count, loaded: resolved)
         result = nil
+    }
+
+    /// Completes a pick of `pickedCount` items with the ones that could be
+    /// `loaded`, following `PickOutcome`.
+    private func complete(
+        _ currentResult: FlutterResult,
+        pickedCount: Int,
+        loaded: [[String: Any]]
+    ) {
+        switch PickOutcome.resolve(pickedCount: pickedCount, loaded: loaded) {
+        case .cancelled:
+            currentResult(nil)
+        case .loaded(let items):
+            currentResult(items)
+        case .loadFailed:
+            currentResult(loadFailedError())
+        }
     }
 
     /// The error for a pick where the user picked at least one item but none
