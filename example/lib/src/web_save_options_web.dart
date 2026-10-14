@@ -3,6 +3,6 @@ import 'package:file_picker_web/file_picker_web.dart';
 
 /// The `webOptions` for `saveFile()` on the web, choosing between a download
 /// and the browser's save dialog.
-WebOptions webSaveOptions({required bool useDialog}) => FilePickerWebOptions(
+WebOptions filePickerWebOptions({required bool useDialog}) => FilePickerWebOptions(
   saveMode: useDialog ? WebSaveMode.dialog : WebSaveMode.download,
 );
