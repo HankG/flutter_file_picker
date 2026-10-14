@@ -9,9 +9,10 @@ enum WebSaveFileMode {
   /// Opens the browser's save dialog, so the user picks the folder and the
   /// file name.
   ///
-  /// Falls back to [download] when the browser does not support the dialog
-  /// or refuses to open it, which happens
-  /// when `saveFile()` is not called right after a user gesture.
+  /// Throws an [UnsupportedError] when the browser does not support the
+  /// dialog, which `supportsShowSaveFileDialog` tells beforehand. Falls back to
+  /// [download] when the browser refuses to open it, which happens when
+  /// `saveFile()` is not called right after a user gesture.
   dialog,
 }
 
@@ -48,8 +49,8 @@ final class FilePickerWebOptions extends WebOptions {
   /// Whether to cancel upload when window loses focus.
   final bool cancelUploadOnWindowBlur;
 
-  /// How `saveFile()` saves the file. Defaults to [WebSaveMode.download].
-  final WebSaveMode saveMode;
+  /// How `saveFile()` saves the file. Defaults to [WebSaveFileMode.download].
+  final WebSaveFileMode saveMode;
 
   /// Creates an instance of [FilePickerWebOptions].
   const FilePickerWebOptions({
@@ -69,6 +70,6 @@ final class FilePickerWebOptions extends WebOptions {
     )
     this.readSequential = false,
     this.cancelUploadOnWindowBlur = true,
-    this.saveMode = WebSaveMode.download,
+    this.saveMode = WebSaveFileMode.download,
   });
 }

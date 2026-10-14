@@ -227,11 +227,16 @@ class FilePickerWeb extends FilePickerPlatform {
   /// Saves [bytes] as [fileName] with the given [mimeType].
   ///
   /// By default it triggers a browser download and returns `null`. With
-  /// `FilePickerWebOptions(saveMode: WebSaveMode.dialog)` it opens the
+  /// `FilePickerWebOptions(saveMode: WebSaveFileMode.dialog)` it opens the
   /// browser's save dialog instead, and returns a [Uri] whose path is the
   /// file name the user chose, since browsers do not expose the folder, or
-  /// `null` if the user cancelled. When the dialog is not available it falls
-  /// back to the download.
+  /// `null` if the user cancelled. That [Uri] has no scheme, so it is not a
+  /// valid file system or network location (no `file`, `http(s)`, `data` or
+  /// `blob` [Uri]) and cannot be used to read the file back.
+  ///
+  /// Throws an [UnsupportedError] if the browser does not support the dialog,
+  /// see [supportsShowSaveFileDialog]. Falls back to the download if the
+  /// browser refuses to open it, typically without a recent user gesture.
   @override
   Future<Uri?> saveFile({
     required String fileName,
@@ -262,12 +267,8 @@ class FilePickerWeb extends FilePickerPlatform {
       );
     }
 
-    final FilePickerWebOptions effectiveWebOptions =
-        webOptions is FilePickerWebOptions
-        ? webOptions
-        : const FilePickerWebOptions();
-
-    if (effectiveWebOptions.saveMode == WebSaveMode.dialog) {
+    if (webOptions is FilePickerWebOptions &&
+        webOptions.saveMode == WebSaveFileMode.dialog) {
       final dialog = await saveWithDialog(
         fileName: fileName,
         bytes: bytes,

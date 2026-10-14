@@ -226,14 +226,20 @@ name, use the browser's save dialog:
 await FilePicker.saveFile(
   fileName: 'report.pdf',
   bytes: bytes,
-  webOptions: const FilePickerWebOptions(saveMode: WebSaveMode.dialog),
+  webOptions: FilePickerWebOptions(
+    saveMode: supportsShowSaveFileDialog
+        ? WebSaveFileMode.dialog
+        : WebSaveFileMode.download,
+  ),
 );
 ```
 
-It returns a `Uri` whose path is the chosen file name, since browsers do not
-expose the folder, or `null` if the user cancelled. Only Chromium based
-browsers support the dialog, and it only opens right after a user gesture,
-so it falls back to the download otherwise.
+It returns a `Uri` whose path is the chosen file name, or `null` if the user
+cancelled. Browsers do not expose the folder, so that `Uri` has no scheme and
+cannot be used to read the file back. Not every browser supports the dialog,
+and `saveFile()` throws an `UnsupportedError` where it is missing, so check
+`supportsShowSaveFileDialog` first. The dialog only opens right after a user
+gesture, so without one it falls back to the download.
 
 `FilePickerWebOptions` comes from `package:file_picker_web`, which can only be
 imported when compiling for the web. In an app that also targets other

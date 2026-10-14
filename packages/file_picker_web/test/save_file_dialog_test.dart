@@ -57,7 +57,7 @@ void main() {
     ''');
   }
 
-  Future<Uri?> save({WebSaveMode? saveMode}) {
+  Future<Uri?> save({WebSaveFileMode? saveMode}) {
     return FilePickerPlatform.instance.saveFile(
       fileName: 'report.txt',
       bytes: bytes,
@@ -88,9 +88,13 @@ void main() {
       };
     ''');
 
-    final uri = await save(saveMode: WebSaveMode.dialog);
+    final uri = await save(saveMode: WebSaveFileMode.dialog);
 
     expect(uri, Uri(path: 'chosen.txt'));
+    expect(uri!.scheme, isEmpty);
+    expect(uri.hasAuthority, isFalse);
+    expect(uri.hasQuery, isFalse);
+    expect(uri.hasFragment, isFalse);
     expect(downloads(), isEmpty);
     final written = readJs('window.__written[0]') as JSUint8Array;
     expect(utf8.decode(written.toDart), 'hello');
@@ -109,7 +113,7 @@ void main() {
   test('returns null without downloading when the user cancels', () async {
     stubPicker("throw new DOMException('cancelled', 'AbortError');");
 
-    expect(await save(saveMode: WebSaveMode.dialog), isNull);
+    expect(await save(saveMode: WebSaveFileMode.dialog), isNull);
     expect(pickerCalls(), 1);
     expect(downloads(), isEmpty);
   });
@@ -119,24 +123,34 @@ void main() {
     () async {
       stubPicker("throw new DOMException('no gesture', 'SecurityError');");
 
-      expect(await save(saveMode: WebSaveMode.dialog), isNull);
+      expect(await save(saveMode: WebSaveFileMode.dialog), isNull);
       expect(pickerCalls(), 1);
       expect(downloads(), ['report.txt']);
     },
   );
 
-  test('falls back to a download when the dialog is not supported', () async {
+  test('throws without downloading when the dialog is not supported', () async {
     runJs('delete window.showSaveFilePicker;');
 
-    expect(await save(saveMode: WebSaveMode.dialog), isNull);
-    expect(downloads(), ['report.txt']);
+    expect(supportsShowSaveFileDialog, isFalse);
+    await expectLater(
+      save(saveMode: WebSaveFileMode.dialog),
+      throwsUnsupportedError,
+    );
+    expect(downloads(), isEmpty);
+  });
+
+  test('reports support when the dialog is available', () {
+    stubPicker('return null;');
+
+    expect(supportsShowSaveFileDialog, isTrue);
   });
 
   test('downloads without opening the dialog by default', () async {
     stubPicker('throw new Error("should not be called");');
 
     expect(await save(), isNull);
-    expect(await save(saveMode: WebSaveMode.download), isNull);
+    expect(await save(saveMode: WebSaveFileMode.download), isNull);
     expect(pickerCalls(), 0);
     expect(downloads(), ['report.txt', 'report.txt']);
   });

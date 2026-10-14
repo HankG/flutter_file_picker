@@ -4,12 +4,17 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:web/web.dart';
 
+import 'file_picker_web_options.dart';
+
 // `showSaveFilePicker()` is not part of package:web, since it is an experimental API.
 //
 // See https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker#browser_compatibility
-// based browsers implement it.
 @JS('showSaveFilePicker')
 external JSFunction? get _showSaveFilePickerFunction;
+
+/// Whether the browser supports the save dialog used by
+/// [WebSaveFileMode.dialog].
+bool get supportsShowSaveFileDialog => _showSaveFilePickerFunction != null;
 
 @JS('showSaveFilePicker')
 external JSPromise<FileSystemFileHandle> _showSaveFilePicker(
@@ -29,8 +34,8 @@ extension type _FilePickerAcceptType._(JSObject _) implements JSObject {
 
 /// The outcome of [saveWithDialog].
 ///
-/// [shown] is `false` when the dialog could not be opened, so the caller
-/// should fall back to a download. When it was shown, [name] is the file name
+/// [shown] is `false` when the browser refused to open the dialog, so the
+/// caller should fall back to a download. When it was shown, [name] is the file name
 /// the user saved to, or `null` if they cancelled.
 typedef SaveDialogResult = ({bool shown, String? name});
 
@@ -38,6 +43,7 @@ typedef SaveDialogResult = ({bool shown, String? name});
 /// [fileName] and an accepted type built from [mimeType] and the file's
 /// extension.
 ///
+/// Throws an [UnsupportedError] if the browser does not support the dialog.
 /// Errors while writing the chosen file are thrown, since the user already
 /// picked a destination.
 Future<SaveDialogResult> saveWithDialog({
@@ -45,7 +51,9 @@ Future<SaveDialogResult> saveWithDialog({
   required Uint8List bytes,
   required String mimeType,
 }) async {
-  if (_showSaveFilePickerFunction == null) return (shown: false, name: null);
+  if (!supportsShowSaveFileDialog) {
+    throw UnsupportedError('This browser does not support the save dialog.');
+  }
 
   final FileSystemFileHandle handle;
   try {

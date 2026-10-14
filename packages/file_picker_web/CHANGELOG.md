@@ -1,6 +1,6 @@
 ## 4.2.0
 
-- Added `FilePickerWebOptions.saveMode`. `WebSaveMode.dialog` saves through the browser's save dialog, falling back to a download where it is not available. [#1732](https://github.com/vicajilau/flutter_file_picker/issues/1732)
+- Added `FilePickerWebOptions.saveMode`. `WebSaveFileMode.dialog` saves through the browser's save dialog, and `supportsShowSaveFileDialog` tells whether the browser supports it. [#1732](https://github.com/vicajilau/flutter_file_picker/issues/1732)
 
 ## 4.1.0
 
