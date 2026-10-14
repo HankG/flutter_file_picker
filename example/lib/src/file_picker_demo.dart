@@ -673,7 +673,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
           value: _multiPick,
         ),
       ),
-      if (_isIOS)
+      if (_isIOS) ...[
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: 400.0),
           child: SwitchListTile.adaptive(
@@ -685,7 +685,6 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
             value: _orderedSelection,
           ),
         ),
-      if (_isIOS)
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: 400.0),
           child: SwitchListTile.adaptive(
@@ -697,7 +696,8 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
             value: _copyMedia,
           ),
         ),
-      if (_isAndroid)
+      ],
+      if (_isAndroid) ...[
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: 400.0),
           child: SwitchListTile.adaptive(
@@ -709,7 +709,6 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
             value: _safPersist,
           ),
         ),
-      if (_isAndroid)
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: 400.0),
           child: SwitchListTile.adaptive(
@@ -721,6 +720,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
             value: _safReadWrite,
           ),
         ),
+      ],
     ];
 
     final actionButtons = <Widget>[
