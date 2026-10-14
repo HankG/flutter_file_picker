@@ -1,7 +1,7 @@
 import 'package:file_picker_platform_interface/file_picker_platform_interface.dart';
 
 /// How `saveFile()` saves the file on the web.
-enum WebSaveMode {
+enum WebSaveFileMode {
   /// Downloads the file, which most browsers drop into the Downloads folder
   /// without asking for a location or a name.
   download,
