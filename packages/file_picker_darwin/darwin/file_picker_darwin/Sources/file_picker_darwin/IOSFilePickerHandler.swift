@@ -174,7 +174,8 @@ final class IOSFilePickerHandler: NSObject,
             // representation, keeps a Live Photo from bringing its whole
             // bundle, paired video included (#2260).
             let typeIdentifier = MediaRepresentation.typeIdentifier(
-                for: item.itemProvider.registeredTypeIdentifiers)
+                for: item.itemProvider.registeredTypeIdentifiers,
+                preferringCompatible: assetRepresentationMode == .compatible)
             item.itemProvider.loadFileRepresentation(
                 forTypeIdentifier: typeIdentifier
             ) { [weak self] url, _ in
@@ -516,7 +517,8 @@ final class IOSFilePickerHandler: NSObject,
         // already end in that bundle's ".pvt" extension, so replace any
         // extension that is not an image or video one.
         let mediaType = MediaRepresentation.mediaType(
-            in: provider.registeredTypeIdentifiers)
+            in: provider.registeredTypeIdentifiers,
+            preferringCompatible: assetRepresentationMode == .compatible)
         let currentExtension = (name as NSString).pathExtension
         let hasMediaExtension = UTType(filenameExtension: currentExtension)
             .map(MediaRepresentation.isMedia) ?? false
