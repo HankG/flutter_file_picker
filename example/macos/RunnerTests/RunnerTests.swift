@@ -46,3 +46,29 @@ struct PickOutcomeTests {
         #expect(items == ["a"])
     }
 }
+
+@Suite("MediaRepresentation")
+struct MediaRepresentationTests {
+    // A Live Photo registers its bundle first. Loading that would bring the
+    // paired video along with the still image (#2260).
+    @Test("A Live Photo loads its still image, not its bundle")
+    func livePhoto() {
+        let identifier = MediaRepresentation.typeIdentifier(
+            for: ["com.apple.live-photo-bundle", "public.heic", "public.jpeg"])
+        #expect(identifier == "public.heic")
+    }
+
+    @Test("A video loads as a video")
+    func video() {
+        let identifier = MediaRepresentation.typeIdentifier(
+            for: ["com.apple.quicktime-movie"])
+        #expect(identifier == "com.apple.quicktime-movie")
+    }
+
+    @Test("An item with no image or video falls back to any representation")
+    func noMedia() {
+        let identifier = MediaRepresentation.typeIdentifier(
+            for: ["com.apple.live-photo-bundle", "com.example.unknown"])
+        #expect(identifier == "public.item")
+    }
+}
