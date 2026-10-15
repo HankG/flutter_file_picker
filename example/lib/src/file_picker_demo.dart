@@ -2,6 +2,9 @@ import 'package:file/local.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:android_file_picker/android_file_picker.dart';
 import 'package:flutter/foundation.dart';
+// Deprecated in favor of package:material_ui, which needs a newer Flutter than
+// CI's oldest one. Migrating is tracked in #2210.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:typed_data';
