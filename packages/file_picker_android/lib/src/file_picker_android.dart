@@ -110,7 +110,7 @@ class FilePickerAndroid extends FilePickerPlatform {
       }
 
       final Map<String, Object?>? safOptionsMap = switch (androidOptions) {
-        FilePickerAndroidOptions opts => opts.toMap(),
+        FilePickerAndroidOptions opts => opts.safOptions.toMap(),
         _ => null,
       };
 
@@ -166,7 +166,7 @@ class FilePickerAndroid extends FilePickerPlatform {
   }) async {
     try {
       final Map<String, Object?>? safOptionsMap = switch (androidOptions) {
-        FilePickerAndroidOptions opts => opts.toMap(),
+        FilePickerAndroidOptions opts => opts.safOptions.toMap(),
         _ => null,
       };
 
