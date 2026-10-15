@@ -101,8 +101,9 @@ jobs:
         run: melos exec --concurrency=1 -- flutter analyze .
 
       # `melos run test` relaunches melos through `dart run melos:melos`,
-      # which cannot find the global installation on Flutter 3.50 beta.
-      # Calling exec directly, like the analyze step, avoids that.
+      # which cannot find the global installation on Flutter 3.50 beta
+      # (https://github.com/blaugold/cli_launcher/issues/28). Calling exec
+      # directly, like the analyze step, avoids that.
       - name: Run tests
         run: melos exec --concurrency=1 -- flutter test
 
