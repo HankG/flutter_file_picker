@@ -1,3 +1,9 @@
+## 2.3.2
+
+- Fixed picking a Live Photo on iOS copying its paired video too and leaving it in the temporary directory. Only the still image is loaded now. [#2260](https://github.com/vicajilau/flutter_file_picker/issues/2260)
+- Fixed picking a package document on iOS, such as an `.rtfd`, returning an image from inside it. [#2259](https://github.com/vicajilau/flutter_file_picker/issues/2259)
+- Fixed files picked with the iOS document picker being stored twice in the temporary directory. [#2261](https://github.com/vicajilau/flutter_file_picker/issues/2261)
+
 ## 2.3.1
 
 - Fixed a pick on iOS where none of the picked items could be loaded completing with an empty list, as if the user had cancelled. It now throws a `PlatformException` with the `load_failed` code. [#2248](https://github.com/vicajilau/flutter_file_picker/issues/2248)
