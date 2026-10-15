@@ -12,7 +12,7 @@ import 'file_picker_web_options.dart';
 @JS('showSaveFilePicker')
 external JSFunction? get _showSaveFilePickerFunction;
 
-/// Whether the browser supports the save dialog used by
+/// Whether the browser supports the `showSaveFilePicker` API.
 /// [WebSaveFileMode.dialog].
 bool get supportsShowSaveFileDialog => _showSaveFilePickerFunction != null;
 
