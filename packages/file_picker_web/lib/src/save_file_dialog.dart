@@ -4,8 +4,6 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:web/web.dart';
 
-import 'file_picker_web_options.dart';
-
 // `showSaveFilePicker()` is not part of package:web, since it is an experimental API.
 //
 // See https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker#browser_compatibility
@@ -13,7 +11,6 @@ import 'file_picker_web_options.dart';
 external JSFunction? get _showSaveFilePickerFunction;
 
 /// Whether the browser supports the `showSaveFilePicker` API.
-/// [WebSaveFileMode.dialog].
 bool get supportsShowSaveFileDialog => _showSaveFilePickerFunction != null;
 
 @JS('showSaveFilePicker')
@@ -52,7 +49,9 @@ Future<SaveDialogResult> saveWithDialog({
   required String mimeType,
 }) async {
   if (!supportsShowSaveFileDialog) {
-    throw UnsupportedError('This browser does not support the showSaveFilePicker API.');
+    throw UnsupportedError(
+      'This browser does not support the showSaveFilePicker API.',
+    );
   }
 
   final FileSystemFileHandle handle;

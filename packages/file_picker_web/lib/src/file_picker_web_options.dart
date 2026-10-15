@@ -1,6 +1,9 @@
+/// @docImport 'file_picker_web.dart';
+library;
+
 import 'package:file_picker_platform_interface/file_picker_platform_interface.dart';
 
-/// How `saveFile()` saves the file on the web.
+/// How [FilePickerWeb.saveFile] saves the file on the web.
 enum WebSaveFileMode {
   /// Downloads the file, which most browsers drop into the Downloads folder
   /// without asking for a location or a name.
@@ -8,11 +11,6 @@ enum WebSaveFileMode {
 
   /// Opens the browser's save dialog, so the user picks the folder and the
   /// file name.
-  ///
-  /// Throws an [UnsupportedError] when the browser does not support the
-  /// dialog, which `supportsShowSaveFileDialog` tells beforehand. Falls back to
-  /// [download] when the browser refuses to open it, which happens when
-  /// `saveFile()` is not called right after a user gesture.
   dialog,
 }
 
@@ -49,7 +47,8 @@ final class FilePickerWebOptions extends WebOptions {
   /// Whether to cancel upload when window loses focus.
   final bool cancelUploadOnWindowBlur;
 
-  /// How `saveFile()` saves the file. Defaults to [WebSaveFileMode.download].
+  /// How [FilePickerWeb.saveFile] saves the file. Defaults to
+  /// [WebSaveFileMode.download].
   final WebSaveFileMode saveMode;
 
   /// Creates an instance of [FilePickerWebOptions].

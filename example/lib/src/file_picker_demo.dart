@@ -705,8 +705,10 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
         ConstrainedBox(
           constraints: const BoxConstraints.tightFor(width: 400.0),
           child: SwitchListTile.adaptive(
-            title: const Text(
-              'Save with dialog (web)',
+            title: Text(
+              supportsSaveDialog
+                  ? 'Save with dialog (web)'
+                  : 'Save with dialog is not supported by your browser',
               textAlign: TextAlign.left,
             ),
             onChanged: supportsSaveDialog

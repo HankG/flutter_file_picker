@@ -19,8 +19,11 @@ void main() {
   JSAny? readJs(String expression) =>
       globalContext.callMethod('eval'.toJS, expression.toJS);
 
+  late final FilePickerWeb picker;
+
   setUpAll(() {
     FilePickerWeb.registerWith(webPluginRegistrar);
+    picker = FilePickerPlatform.instance as FilePickerWeb;
     runJs('''
       window.__originalSaveFilePicker = window.showSaveFilePicker;
       window.__originalAnchorClick = HTMLAnchorElement.prototype.click;
@@ -58,7 +61,7 @@ void main() {
   }
 
   Future<Uri?> save({WebSaveFileMode? saveMode}) {
-    return FilePickerPlatform.instance.saveFile(
+    return picker.saveFile(
       fileName: 'report.txt',
       bytes: bytes,
       mimeType: 'text/plain',
