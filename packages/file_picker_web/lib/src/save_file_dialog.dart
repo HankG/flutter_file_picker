@@ -52,7 +52,7 @@ Future<SaveDialogResult> saveWithDialog({
   required String mimeType,
 }) async {
   if (!supportsShowSaveFileDialog) {
-    throw UnsupportedError('This browser does not support the save dialog.');
+    throw UnsupportedError('This browser does not support the showSaveFilePicker API.');
   }
 
   final FileSystemFileHandle handle;
