@@ -1,3 +1,8 @@
+## 2.1.1
+
+- Fixed `AndroidSAFOptions` being ignored, so the grant, access mode and persistence they request now apply. [#2257](https://github.com/vicajilau/flutter_file_picker/issues/2257)
+- Picking several files now fails with `unknown_path` when none of them can be read, instead of returning an empty list as if the user cancelled. [#2262](https://github.com/vicajilau/flutter_file_picker/issues/2262)
+
 ## 2.1.0
 
 - Added `FilePickerAndroid.retrieveLostData()`, to recover the files picked when Android destroys the activity while the picker is open. [#1258](https://github.com/vicajilau/flutter_file_picker/issues/1258)

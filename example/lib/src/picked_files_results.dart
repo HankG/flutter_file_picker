@@ -43,6 +43,12 @@ class PickedFilesResults extends StatelessWidget {
         final assetIdentifier = pickedFile is DarwinPlatformFile
             ? pickedFile.assetIdentifier
             : null;
+        final safAccess = androidPlatformFile?.safHandle?.accessMode.name;
+        final details = [
+          path,
+          if (assetIdentifier != null) 'Asset: $assetIdentifier',
+          if (safAccess != null) 'SAF access: $safAccess',
+        ];
 
         return ListTile(
           leading: Text(
@@ -50,9 +56,7 @@ class PickedFilesResults extends StatelessWidget {
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
           title: Text('File path (SAF Grant: ${androidPlatformFile != null}):'),
-          subtitle: Text(
-            assetIdentifier == null ? path : '$path\nAsset: $assetIdentifier',
-          ),
+          subtitle: Text(details.join('\n')),
           trailing: trailingWidget,
         );
       },
